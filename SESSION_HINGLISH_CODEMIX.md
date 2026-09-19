@@ -67,7 +67,9 @@ wc -l codemix_hinglish/train_meta.jsonl   # train done ≈ 20183
 
 Outputs: `codemix_hinglish/{train,val,test}.csv`, `*_quarantine.csv`, `*_report.json`.
 
-**Note:** `*.onnx` is gitignored — scorer is pulled from `S3_SCORER_URI` on first run. Full batch was started from this agent; progress resumes automatically after re-auth.
+**Note:** `*.onnx` is gitignored — scorer is pulled from `S3_SCORER_URI` on first run.
+
+**Blocker (cloud agent):** This VM has no AWS credentials yet. Full Bedrock Mantle conversion is paused until you either paste an `aws login --remote` authorization code in chat, or add `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` secrets. Pilot artifacts and the converter script are already in-repo.
 
 ## Research hook (HinGE / Eval4NLP PDF)
 
