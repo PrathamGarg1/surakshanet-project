@@ -43,50 +43,31 @@ After stronger quarantine reprocess:
 
 Artifacts: `codemix_hinglish/pilot/`
 
-## Full MACD conversion (cloud)
-
-Two ways to run (same converter + abuse gates):
-
-### A) This Cursor cloud agent / any Linux host
+## Full MACD conversion (AWS / this cloud agent)
 
 ```bash
-# 1) AWS auth (browser device code)
-aws login --remote
+# 1) Auth
+aws login --remote          # or export AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY
 export AWS_REGION=us-east-1
 export S3_SCORER_URI=s3://suraksha-hinglish-439446323592-20260908170949/run-20260908170949/output/custom-macd-model
 
-# 2) deps once
+# 2) Deps once
 python3 -m venv .venv_codemix && .venv_codemix/bin/pip install -r aws_train/requirements_codemix.txt
 
-# 3) supervised chunked full run (resumes via row_id)
+# 3) Supervised chunked full run (resumes via row_id)
 bash aws_train/run_codemix_full.sh
 ```
 
-### B) Modal (durable remote workers)
-
-```bash
-modal secret create aws-bedrock \
-  AWS_ACCESS_KEY_ID=... AWS_SECRET_ACCESS_KEY=... \
-  AWS_DEFAULT_REGION=us-east-1 \
-  S3_SCORER_URI=s3://.../custom-macd-model \
-  CODEMIX_MODEL=qwen.qwen3-32b CODEMIX_REGION=us-east-1
-
-modal run aws_train/modal_codemix.py --pilot
-modal run aws_train/modal_codemix.py --full --split train --limit 500 --loops 40
-```
-
-Outputs land in `codemix_hinglish/` (agent) or Modal volume `surakshanet-codemix` at `/vol/codemix_hinglish`.
-
-Monitor (agent):
+Monitor:
 
 ```bash
 tail -f codemix_hinglish/full_convert.log
 wc -l codemix_hinglish/train_meta.jsonl   # train done ≈ 20183
 ```
 
-Outputs when done: `codemix_hinglish/{train,val,test}.csv`, `*_quarantine.csv`, `*_report.json`.
+Outputs: `codemix_hinglish/{train,val,test}.csv`, `*_quarantine.csv`, `*_report.json`.
 
-**Note:** `*.onnx` is gitignored — scorer is pulled from `S3_SCORER_URI` on first run.
+**Note:** `*.onnx` is gitignored — scorer is pulled from `S3_SCORER_URI` on first run. Full batch was started from this agent; progress resumes automatically after re-auth.
 
 ## Research hook (HinGE / Eval4NLP PDF)
 
