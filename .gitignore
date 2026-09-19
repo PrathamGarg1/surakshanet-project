@@ -6,3 +6,7 @@ dist/
 assets/models/
 *.onnx
 *.wasm
+
+.venv_codemix/
+codemix_hinglish/full_convert.pid
+codemix_hinglish/full_convert.log

@@ -122,11 +122,47 @@ class GateResult:
     delta: float
 
 
+def ensure_scorer_dir(model_dir: Path) -> Path:
+    """Resolve local ONNX scorer; optionally sync from S3_SCORER_URI / S3_OUTPUT_URI."""
+    import os
+    import subprocess
+
+    model_dir = Path(model_dir)
+    onnx = model_dir / "model_quantized.onnx"
+    onnx_alt = model_dir / "onnx" / "model_quantized.onnx"
+    if onnx.exists() or onnx_alt.exists():
+        return model_dir
+
+    s3_uri = (os.environ.get("S3_SCORER_URI") or "").strip()
+    if not s3_uri:
+        out = (os.environ.get("S3_OUTPUT_URI") or "").strip().rstrip("/")
+        if out.startswith("s3://"):
+            s3_uri = f"{out}/custom-macd-model"
+
+    if not s3_uri:
+        raise FileNotFoundError(
+            f"No ONNX scorer at {model_dir} and S3_SCORER_URI/S3_OUTPUT_URI unset. "
+            "Copy model_quantized.onnx here or set S3_SCORER_URI=s3://bucket/prefix/"
+        )
+
+    model_dir.mkdir(parents=True, exist_ok=True)
+    print(f"syncing scorer from {s3_uri} -> {model_dir}", flush=True)
+    subprocess.check_call(
+        ["aws", "s3", "sync", s3_uri.rstrip("/") + "/", str(model_dir)]
+    )
+    if not onnx.exists() and not onnx_alt.exists():
+        raise FileNotFoundError(
+            f"Synced {s3_uri} but model_quantized.onnx still missing under {model_dir}"
+        )
+    return model_dir
+
+
 class AbuseScorer:
     def __init__(self, model_dir: Path) -> None:
         from transformers import AutoTokenizer
         import onnxruntime as ort
 
+        model_dir = ensure_scorer_dir(Path(model_dir))
         self.tok = AutoTokenizer.from_pretrained(str(model_dir))
         onnx_path = model_dir / "model_quantized.onnx"
         if not onnx_path.exists():
