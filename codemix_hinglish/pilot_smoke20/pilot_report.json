@@ -1,0 +1,16 @@
+{
+  "tag": "pilot",
+  "model": "qwen.qwen3-32b",
+  "region": "us-east-1",
+  "delta": 0.15,
+  "accepted": 19,
+  "quarantined": 1,
+  "skipped_done": 0,
+  "abusive_accept_rate": 0.9,
+  "mean_score_delta": -0.09132291807940132,
+  "by_fail": {
+    "abuse_score_drop": 1
+  },
+  "accepted_path": "/Users/prathamgarg/Desktop/senior-sde-audit-surakshanet/codemix_hinglish/pilot/pilot.csv",
+  "quarantine_path": "/Users/prathamgarg/Desktop/senior-sde-audit-surakshanet/codemix_hinglish/pilot/pilot_quarantine.csv"
+}

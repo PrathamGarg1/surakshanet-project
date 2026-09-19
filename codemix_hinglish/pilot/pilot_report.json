@@ -1,0 +1,13 @@
+{
+  "tag": "pilot_final",
+  "model": "qwen.qwen3-32b",
+  "region": "us-east-1",
+  "delta": 0.15,
+  "accepted": 285,
+  "quarantined": 15,
+  "abusive_accept_rate": 0.9,
+  "mean_score_delta": -0.12935719298245613,
+  "by_fail": {
+    "abuse_score_drop": 15
+  }
+}

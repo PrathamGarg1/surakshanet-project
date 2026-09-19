@@ -1,0 +1,16 @@
+row_id,split,label,text,hindi_text,hindi_abuse,hinglish_abuse,score_delta,attempts,fail_reason,last_output
+train-16507,train,0,,करण जोहर छक्का,0.9984,0.0474,0.9509,5,abuse_score_drop,Karan Johar chhakka
+train-459,train,0,,कितनो को मरोगी इस लाल खून से 😜🤣🤣,0.9515,0.0207,0.9309,5,abuse_score_drop,Kitne ko marogi is laal khun se 😜🤣🤣
+train-13681,train,0,,ज़हरीले लोग के सामने सांप का जहर भी फीका पड़ जाता है।।बायकाट बालीवुड।।,0.9857,0.0173,0.9684,5,abuse_score_drop,Jahre log ke saamne saap ka jehar bhi feeke paat jata hai. Baaykot bollywood.
+train-17434,train,0,,समोसा तितली थोडी हि ना होता है । सब के सब पागल है।,0.974,0.0099,0.9641,5,abuse_score_drop,Samosa titli thi to bhi na hota. Sab ke sab pagal hai.
+train-18584,train,0,,"सही है, सबकी अपनी अपनी पसंद है, किसी को परी पसंद है तो किसी को चुडैल। मुझे तो परी पसंद है।",0.9966,0.0347,0.9619,5,abuse_score_drop,"Sahi hai, sabki apni apni pasand hai, kisi ko pari pasand hai toh kisi ko chudail. Mujhe to pari pasand hai."
+train-18214,train,0,,"डबल हो ले, आजा",0.9888,0.0053,0.9835,5,abuse_score_drop,"Double ho jao, aja"
+train-15285,train,0,,चाँद भी कमाल का है कुछ दिन पहले दिखा तो लाखो बकरों की जान ले ली और.. . . आज दिखेगा तो.. लाखो बकरों की उम्र बढ़ा जायेगा!,0.9914,0.0187,0.9727,5,abuse_score_drop,"Chand bhi kamal ka hai, kuchh din pehle dikha to laakhon bakron ki jaan le li aur... aaj dikhega to laakhon bakron ki umar badha jayega!"
+train-1359,train,0,,डूब के मरजा,0.9924,0.0125,0.9799,5,abuse_score_drop,Dob ke marja
+train-1333,train,0,,बाहर बैठा है क्योकि उसके साथ बगल में उनके पालतू कुत्ता बैठा है!!😊😁😃😬,0.9733,0.0422,0.931,5,abuse_score_drop,Bahar baithe hue hain kyoki unke saath unke palatoo kutta betha hai!! 😊😁😃😬
+train-17753,train,0,,ओ बाई जि थोङी तो सरम कर लो,0.9979,0.0649,0.933,5,abuse_score_drop,O bai ji thongi toh surma laga lo
+train-2301,train,0,,तुम्हारे में घुसने का मन कर रहा है,0.9974,0.0059,0.9915,5,abuse_score_drop,Tumhare me dale ke mana ho raha hai
+train-14381,train,0,,रेलवे स्टेशन पर रहती हो क्या?,0.9519,0.0332,0.9186,5,abuse_score_drop,Raita station par rehta ho kya?
+train-8810,train,0,,बूढ़ी हो रही हैं तब भी मोटी को सर्म नहीं है मर जा पागल मोटी,0.9992,0.008,0.9912,5,abuse_score_drop,"Booirdi ho rahi ho tab bhi moti ko siram nahi hai, mar ja pagal moti"
+train-6005,train,0,,गांड लाल  कर दी यार,0.9992,0.0502,0.9491,5,abuse_score_drop,Gand lal kar diya yaar
+train-730,train,0,,कोरोना भाई तु कितना तडपाता है तु कितना बेरहम है इस बार मुझे पाॅजिटिव कर और ले जा अपना भाई बना कर फिर हम दोनो दुनिया वालो से चुन चुन के बदला लेंगे🤣😂🤪🤣,0.9147,0.0088,0.9059,5,abuse_score_drop,"Corona bhai tu kitna tadpati hai, tu kitna bereham hai. Is baar mujhe positive kar ke le ja apna bhai banake, fir hum dono duniya walo se chun chun ke badalayenge 😂🤣🤪"

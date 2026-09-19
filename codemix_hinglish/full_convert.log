@@ -1,0 +1,58 @@
+Loading abuse scorer...
+[transformers] PyTorch was not found. Models won't be available and only tokenizers, configuration and file/data utilities can be used.
+Connecting Mantle region=us-east-1 model=qwen.qwen3-32b
+Loading abuse scorer...
+[transformers] PyTorch was not found. Models won't be available and only tokenizers, configuration and file/data utilities can be used.
+Connecting Mantle region=us-east-1 model=qwen.qwen3-32b
+[train] progress accepted=44 quarantine=6
+Loading abuse scorer...
+[transformers] PyTorch was not found. Models won't be available and only tokenizers, configuration and file/data utilities can be used.
+Connecting Mantle region=us-east-1 model=qwen.qwen3-32b
+[train] progress accepted=46 quarantine=4
+Loading abuse scorer...
+[transformers] PyTorch was not found. Models won't be available and only tokenizers, configuration and file/data utilities can be used.
+Connecting Mantle region=us-east-1 model=qwen.qwen3-32b
+[train] progress accepted=46 quarantine=4
+[train] progress accepted=90 quarantine=10
+[2026-09-19T17:17:00+05:30] supervisor start
+[2026-09-19T17:17:00+05:30] launching converter
+Loading abuse scorer...
+[transformers] PyTorch was not found. Models won't be available and only tokenizers, configuration and file/data utilities can be used.
+Connecting Mantle region=us-east-1 model=qwen.qwen3-32b
+[train] progress accepted=49 quarantine=1
+[train] progress accepted=97 quarantine=3
+[train] progress accepted=141 quarantine=9
+[2026-09-19T17:22:48+05:30] supervisor start
+[2026-09-19T17:22:48+05:30] chunk train
+Loading abuse scorer...
+[transformers] PyTorch was not found. Models won't be available and only tokenizers, configuration and file/data utilities can be used.
+Connecting Mantle region=us-east-1 model=qwen.qwen3-32b
+train: converting up to 200 new rows
+[train] progress accepted=45 quarantine=5
+[train] progress accepted=88 quarantine=12
+[train] progress accepted=135 quarantine=15
+[train] progress accepted=183 quarantine=17
+{
+  "tag": "train",
+  "model": "qwen.qwen3-32b",
+  "region": "us-east-1",
+  "delta": 0.15,
+  "workers": 3,
+  "accepted": 183,
+  "quarantined": 17,
+  "skipped_done": 0,
+  "abusive_accept_rate": 0.8380952380952381,
+  "mean_score_delta": -0.12493497797903794,
+  "by_fail": {
+    "abuse_score_drop": 14,
+    "abuse_lexicon_missing": 2,
+    "collapsed_length": 1
+  },
+  "accepted_path": "/Users/prathamgarg/Desktop/senior-sde-audit-surakshanet/codemix_hinglish/train.csv",
+  "quarantine_path": "/Users/prathamgarg/Desktop/senior-sde-audit-surakshanet/codemix_hinglish/train_quarantine.csv"
+}
+[2026-09-19T17:24:10+05:30] chunk val
+Loading abuse scorer...
+[transformers] PyTorch was not found. Models won't be available and only tokenizers, configuration and file/data utilities can be used.
+Connecting Mantle region=us-east-1 model=qwen.qwen3-32b
+val: converting up to 200 new rows

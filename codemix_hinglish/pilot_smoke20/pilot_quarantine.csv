@@ -1,0 +1,2 @@
+row_id,split,label,text,hindi_text,hindi_abuse,hinglish_abuse,score_delta,attempts,fail_reason,last_output
+train-18214,train,0,,"डबल हो ले, आजा",0.9888,0.0058,0.983,3,abuse_score_drop,

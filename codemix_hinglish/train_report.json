@@ -1,0 +1,19 @@
+{
+  "tag": "train",
+  "model": "qwen.qwen3-32b",
+  "region": "us-east-1",
+  "delta": 0.15,
+  "workers": 3,
+  "accepted": 183,
+  "quarantined": 17,
+  "skipped_done": 0,
+  "abusive_accept_rate": 0.8380952380952381,
+  "mean_score_delta": -0.12493497797903794,
+  "by_fail": {
+    "abuse_score_drop": 14,
+    "abuse_lexicon_missing": 2,
+    "collapsed_length": 1
+  },
+  "accepted_path": "/Users/prathamgarg/Desktop/senior-sde-audit-surakshanet/codemix_hinglish/train.csv",
+  "quarantine_path": "/Users/prathamgarg/Desktop/senior-sde-audit-surakshanet/codemix_hinglish/train_quarantine.csv"
+}
