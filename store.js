@@ -1,21 +1,10 @@
-/** Local incident log. On-device only. Hash = id/dedupe, not the whole product. */
+/** Local incident log (chrome.storage.local). Nothing leaves the device. */
 const KEY = 'surakshanet_incidents';
-const CAP = 200;
+const MAX_INCIDENTS = 200; // oldest ones are dropped beyond this
 
-export async function sha256(text) {
+async function sha256(text) {
   const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
   return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, '0')).join('');
-}
-
-export async function saveIncident({ text, contact, score, severity }) {
-  const chat = typeof contact === 'string' && contact.trim() ? contact.trim() : 'Unknown chat';
-  const id = await sha256(`${chat}\n${text.trim().toLowerCase()}`);
-  const { [KEY]: list = [] } = await chrome.storage.local.get(KEY);
-  if (list.some((x) => x.id === id)) return null;
-  const row = { id, ts: new Date().toISOString(), contact: chat, score, severity, text, screenshot: null };
-  list.unshift(row);
-  await chrome.storage.local.set({ [KEY]: list.slice(0, CAP) });
-  return row;
 }
 
 export async function listIncidents() {
@@ -23,14 +12,24 @@ export async function listIncidents() {
   return list;
 }
 
+/** Saves a flagged message. Returns the new incident, or null if it was a duplicate. */
+export async function saveIncident({ text, contact, score, severity }) {
+  const chat = typeof contact === 'string' && contact.trim() ? contact.trim() : 'Unknown chat';
+  const id = await sha256(`${chat}\n${text.trim().toLowerCase()}`);
+
+  const list = await listIncidents();
+  if (list.some((incident) => incident.id === id)) return null;
+
+  const incident = { id, ts: new Date().toISOString(), contact: chat, score, severity, text };
+  await chrome.storage.local.set({ [KEY]: [incident, ...list].slice(0, MAX_INCIDENTS) });
+  return incident;
+}
+
 export async function clearIncidents() {
   await chrome.storage.local.set({ [KEY]: [] });
 }
 
 export async function exportJSON() {
-  return JSON.stringify(
-    { exportedAt: new Date().toISOString(), incidents: await listIncidents() },
-    null,
-    2,
-  );
+  const incidents = await listIncidents();
+  return JSON.stringify({ exportedAt: new Date().toISOString(), incidents }, null, 2);
 }

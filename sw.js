@@ -1,192 +1,65 @@
-import { pipeline, env } from '@xenova/transformers';
+import { classify, loadModel } from './classifier.js';
 import { saveIncident } from './store.js';
 
-env.allowLocalModels = true;
-env.allowRemoteModels = false;
-env.localModelPath = chrome.runtime.getURL('assets/models/');
-// CacheStorage rejects chrome-extension:// request URLs in Chrome.
-env.useBrowserCache = false;
-env.backends.onnx.wasm.numThreads = 1;
-env.backends.onnx.wasm.proxy = false;
-env.backends.onnx.wasm.wasmPaths = chrome.runtime.getURL('assets/');
+const jobs = [];
+let isBusy = false;
 
-const DEBUG = true;
-const DEBUG_LOG_MESSAGES = true;
-const FLAG = 0.5;
-const HIGH = 0.9;
-const PREFIX = '[SurakshaNet]';
+async function workThroughJobs() {
+  if (isBusy) return;
+  isBusy = true;
 
-let classifier = null;
-let modelPromise = null;
-const queue = [];
-let busy = false;
-
-function log(event, details = {}) {
-  if (DEBUG) console.info(PREFIX, event, details);
-}
-
-function logError(event, error, details = {}) {
-  console.error(PREFIX, event, {
-    ...details,
-    error: String(error?.stack || error?.message || error),
-  });
-}
-
-function debugText(text) {
-  return DEBUG_LOG_MESSAGES ? text : `[redacted:${text.length} chars]`;
-}
-
-log('worker:loaded', {
-  model: 'custom-macd-model',
-  localModels: env.allowLocalModels,
-  remoteModels: env.allowRemoteModels,
-  wasmThreads: env.backends.onnx.wasm.numThreads,
-});
-
-async function ensureModel() {
-  if (classifier) return classifier;
-  if (!modelPromise) {
-    log('model:load:start', { modelPath: env.localModelPath });
-    modelPromise = pipeline('text-classification', 'custom-macd-model', { top_k: null })
-      .then((loaded) => {
-        classifier = loaded;
-        log('model:load:success');
-        return loaded;
-      })
-      .catch((error) => {
-        modelPromise = null;
-        logError('model:load:failed', error, { modelPath: env.localModelPath });
-        throw error;
-      });
-  }
-  return modelPromise;
-}
-
-function abusiveScore(results) {
-  const rows = Array.isArray(results) ? results : [results];
-  for (const r of rows) {
-    const l = String(r.label).toLowerCase();
-    if (l === 'abusive' || l === 'label_0') return r.score;
-  }
-  for (const r of rows) {
-    const l = String(r.label).toLowerCase();
-    if (l === 'non-abusive' || l === 'label_1') return 1 - r.score;
-  }
-  return 0;
-}
-
-async function classify(text) {
-  log('classify:start', { text: debugText(text), textLength: text.length });
-  await ensureModel();
-  const score = abusiveScore(await classifier(text));
-  const flagged = score > FLAG;
-  const result = {
-    flagged,
-    score,
-    severity: !flagged ? null : score >= HIGH ? 'high' : 'medium',
-  };
-  log('classify:complete', {
-    text: debugText(text),
-    textLength: text.length,
-    flagged: result.flagged,
-    score: Number(result.score.toFixed(4)),
-    severity: result.severity,
-  });
-  return result;
-}
-
-async function drain() {
-  if (busy) return;
-  busy = true;
-  log('queue:drain:start', { pending: queue.length });
   try {
-    while (queue.length) {
-      const job = queue.shift();
-      log('queue:job:start', {
-        pending: queue.length,
-        text: debugText(job.text),
-        textLength: job.text.length,
-        contact: job.contact,
-      });
+    while (jobs.length > 0) {
+      const job = jobs.shift();
       try {
         const result = await classify(job.text);
         if (result.flagged) {
-          const saved = await saveIncident({
-            text: job.text,
-            contact: job.contact,
-            score: result.score,
-            severity: result.severity,
-          });
-          log('incident:save', {
-            created: Boolean(saved),
-            id: saved?.id?.slice(0, 12) || null,
-            text: debugText(job.text),
-            contact: job.contact,
-          });
+          await saveIncident({ text: job.text, contact: job.contact, ...result });
         }
-        job.resolve(result);
-        log('queue:job:success', { pending: queue.length, flagged: result.flagged });
+        job.reply(result); 
+        // reply is the same callback called from the 
+        // content script 
+        // ie "sendResponse" 
       } catch (error) {
-        logError('queue:job:failed', error, {
-          textLength: job.text.length,
-          contact: job.contact,
-        });
-        job.reject(error);
+        // A failed message must not stop the ones waiting behind it.
+        job.reply({ flagged: false, error: String(error.message || error) });
       }
     }
   } finally {
-    busy = false;
-    log('queue:drain:complete', { pending: queue.length });
+    isBusy = false;
+    if (jobs.length > 0) workThroughJobs();
   }
 }
 
-function enqueue(text, contact) {
-  log('queue:enqueue', {
-    text: debugText(text),
-    pending: queue.length + 1,
-    textLength: text.length,
-    contact,
-  });
-  return new Promise((resolve, reject) => {
-    queue.push({ text, contact, resolve, reject });
-    drain();
-  });
+async function preloadModel() {
+  try {
+    await loadModel();
+  } catch {
+    // The next real message will try to load the model again.
+  }
 }
 
-chrome.runtime.onInstalled.addListener((details) => {
-  log('runtime:installed', { reason: details.reason });
-  ensureModel().catch(() => {});
+chrome.runtime.onInstalled.addListener(() => {
+  preloadModel();
 });
 chrome.runtime.onStartup.addListener(() => {
-  log('runtime:startup');
-  ensureModel().catch(() => {});
+  preloadModel();
 });
-chrome.runtime.onSuspend.addListener(() => log('runtime:suspend'));
 
-chrome.runtime.onMessage.addListener((msg, _s, sendResponse) => {
-  if (msg?.type !== 'ANALYZE') {
-    log('message:ignored', { type: msg?.type || null });
-    return false;
-  }
+chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
+  // _sender represnets the TAB which sent it 
+  // sendResponse is the callback sent be chrome to be called when listened!!
+
+  if (msg?.type !== 'ANALYZE') return false;
+
   if (typeof msg.text !== 'string' || !msg.text.trim()) {
-    log('message:invalid', { textType: typeof msg.text });
     sendResponse({ flagged: false, error: 'Message text is required.' });
     return false;
   }
-  log('message:analyze', {
-    text: debugText(msg.text),
-    textLength: msg.text.length,
-    contact: msg.contact,
-  });
-  enqueue(msg.text, msg.contact)
-    .then((r) => sendResponse(r))
-    .catch((error) => {
-      logError('message:analyze:failed', error, {
-        text: debugText(msg.text),
-        textLength: msg.text.length,
-        contact: msg.contact,
-      });
-      sendResponse({ flagged: false, error: String(error.message || error) });
-    });
+
+  jobs.push({ text: msg.text, contact: msg.contact, reply: sendResponse });
+  workThroughJobs();
+
+  // Chrome closes the channel unless we return true before the awaits finish.
   return true;
 });

@@ -39,8 +39,17 @@ and select `dist/`. Reload the extension and refresh WhatsApp Web.
 The build bundles the extension, local model assets, ONNX Runtime WebAssembly,
 and the PDF font. Runtime processing stays inside the browser.
 
+## Code layout
+
+- `content.js` – watches WhatsApp Web, finds incoming messages, shows warnings
+- `banner.js` – the warning banner and bubble highlight
+- `sw.js` – service worker: receives messages, queues them, saves incidents
+- `classifier.js` – loads the on-device model and scores text
+- `store.js` – local incident storage
+- `popup.html` / `popup.js` / `pdf_exporter.js` – dashboard and exports
+
 ## Debugging
 
-Inspect the service worker from `chrome://extensions` or inspect the WhatsApp
-Web page console. `DEBUG` controls general logs; `DEBUG_LOG_MESSAGES` controls
-whether message text is printed. Disable both after debugging.
+Inspect the service worker from `chrome://extensions`, or the WhatsApp Web page
+console, using the normal Chrome DevTools. There is no built-in logging, so
+message text is never written to the console.
