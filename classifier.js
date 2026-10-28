@@ -15,9 +15,9 @@ env.allowLocalModels = true;
 env.allowRemoteModels = false;
 env.localModelPath = chrome.runtime.getURL('assets/models/');
 env.useBrowserCache = false; // CacheStorage rejects chrome-extension:// URLs
-env.backends.onnx.wasm.numThreads = 1;
-env.backends.onnx.wasm.proxy = false;
-env.backends.onnx.wasm.wasmPaths = chrome.runtime.getURL('assets/');
+env.backends.onnx.wasm.numThreads = 1; // for lesser security permissions 
+env.backends.onnx.wasm.proxy = false; // model shoul also run in exactly this web worker not any other thread ( only one thread as told above )
+env.backends.onnx.wasm.wasmPaths = chrome.runtime.getURL('assets/'); // .wasm 
 
 let modelPromise = null;
 
